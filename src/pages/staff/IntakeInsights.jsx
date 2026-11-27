@@ -334,14 +334,14 @@ export function SymptomsPanel({ intake, notify }) {
 
 const PAGE = 5;
 
-export function HistoryPanel({ intakeId }) {
+export function HistoryPanel({ intakeId, fetchHistory = getIntakeHistory }) {
   const [state, SetState] = useState({ phase: "loading", data: null, error: "" });
   const [more, SetMore] = useState(false);
 
   useEffect(() => {
     let alive = true;
     SetState({ phase: "loading", data: null, error: "" });
-    getIntakeHistory(intakeId, { limit: PAGE, offset: 0 })
+    fetchHistory(intakeId, { limit: PAGE, offset: 0 })
       .then((data) => alive && SetState({ phase: "ready", data, error: "" }))
       .catch((err) => {
         if (!alive) return;
@@ -359,7 +359,7 @@ export function HistoryPanel({ intakeId }) {
   const loadMore = async () => {
     SetMore(true);
     try {
-      const next = await getIntakeHistory(intakeId, { limit: PAGE, offset: state.data.encounters.length });
+      const next = await fetchHistory(intakeId, { limit: PAGE, offset: state.data.encounters.length });
       SetState((cur) => ({ ...cur, data: { ...cur.data, encounters: [...cur.data.encounters, ...next.encounters] } }));
     } catch (err) {
       SetState((cur) => ({ ...cur, error: err.message }));

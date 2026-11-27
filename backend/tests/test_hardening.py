@@ -19,6 +19,9 @@ from app import maintenance
 PUBLIC = {
     ("GET", "/api/health"), ("GET", "/api/health/db"), ("POST", "/api/auth/login"),
     ("GET", "/api/consent/current"), ("POST", "/api/patients/register"),
+    # Doctor sign-up is public by nature, but it only ever creates a PENDING doctor with no access
+    # (tests/test_doctor_verification.py); an administrator must approve before any doctor endpoint opens.
+    ("POST", "/api/doctors/register"),
     ("POST", "/api/kiosks/heartbeat"),  # needs a kiosk key instead of a login
     # Forgot-password by SMS code: the caller is by definition logged out. Safety lives in the
     # service (same answer for every number, attempt limits, resend limits, patients only).

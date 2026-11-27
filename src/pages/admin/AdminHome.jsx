@@ -5,6 +5,7 @@ import { Activity, Clock3, LayoutDashboard, LogOut, RefreshCw, Users } from "luc
 import { Brand, Btn, Stat, initials, pad2 } from "../../components/ui.jsx";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
 import { adminDashboard } from "../../services/visits.js";
+import DoctorApprovals from "./DoctorApprovals.jsx";
 import { formatDate } from "../../services/intake.js";
 import { listKiosks, registerKiosk, rotateKioskKey, setKioskActive, systemHealth } from "../../services/admin.js";
 
@@ -84,6 +85,7 @@ export default function AdminHome({ go, notify, userName, onLogout, onLanguage }
             <RefreshCw />
           </button>
         </header>
+        <DoctorApprovals notify={notify} />
         {!d && <p className="empty">{t("common.loading")}</p>}
         {d && (
           <>

@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { ArrowRight, Search } from "lucide-react";
 import { Btn, QUEUE_STATUS, Status } from "../../components/ui.jsx";
 import { listQueue } from "../../services/visits.js";
+import { PriorityChip } from "./IntakeInsights.jsx";
 
-export default function QueuePanel({ title, eyebrow, onOpen, notify, refreshKey, emptyText }) {
+export default function QueuePanel({ title, eyebrow, onOpen, notify, refreshKey, emptyText, urgentFirst = false }) {
   const { t } = useTranslation();
   const [items, SetItems] = useState(null);
   const [q, SetQ] = useState("");
@@ -16,7 +17,7 @@ export default function QueuePanel({ title, eyebrow, onOpen, notify, refreshKey,
     SetItems(null);
     const timer = setTimeout(() => {
       listQueue({ q: q.trim(), status })
-        .then((r) => alive && SetItems(r))
+        .then((r) => alive && SetItems(urgentFirst ? [...r].sort((a, b) => (b.priority === "urgent") - (a.priority === "urgent")) : r))
         .catch((err) => {
           if (alive) {
             SetItems([]);
@@ -79,7 +80,10 @@ export default function QueuePanel({ title, eyebrow, onOpen, notify, refreshKey,
         {items && !items.length && <p className="empty">{emptyText || "No visits match."}</p>}
         {(items || []).map((e) => (
           <div className="queue-row" key={e.id}>
-            <b>{e.token}</b>
+            <span>
+              <b>{e.token}</b>
+              {e.priority && <PriorityChip priority={e.priority} />}
+            </span>
             <span>
               <b>{e.patient.full_name}</b>
               <small>

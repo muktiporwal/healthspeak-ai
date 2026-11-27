@@ -6,7 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 from app.core.config import get_settings
-from app.core.enums import Role, UiLanguage
+from app.core.enums import DoctorVerification, Role, UiLanguage
 from app.core.security import normalize_email, normalize_phone
 
 PASSWORD_MIN_LENGTH = 8
@@ -25,6 +25,8 @@ class UserOut(BaseModel):
     is_active: bool
     last_login_at: datetime | None
     created_at: datetime
+    # Doctors only: pending / approved / rejected. The server enforces it on every doctor endpoint.
+    verification_status: DoctorVerification | None = None
 
 
 class PreferencesUpdate(BaseModel):

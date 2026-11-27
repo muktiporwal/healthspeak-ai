@@ -13,7 +13,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
-from app.core.enums import Role
+from app.core.enums import DoctorVerification, Role
 from app.database.models import AuthSession, User
 from app.database.session import get_db
 from app.services import auth_service
@@ -43,12 +43,18 @@ def get_current_user(session: AuthSession = Depends(get_current_session)) -> Use
     return session.user
 
 
-def require_roles(*roles: Role) -> Callable[..., User]:
+def require_roles(*roles: Role, unverified_ok: bool = False) -> Callable[..., User]:
+    """`unverified_ok` is only for the pending doctor's own status page; everything else keeps the check."""
     allowed = {Role(r).value for r in roles}
 
     def _check(user: User = Depends(get_current_user)) -> User:
         if user.role not in allowed:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not permitted")
+        # A self-registered doctor has NO doctor access until an administrator approves the account.
+        if (user.role == Role.DOCTOR.value and not unverified_ok
+                and user.verification_status != DoctorVerification.APPROVED.value):
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                                detail="Doctor account is not verified yet")
         return user
 
     return _check

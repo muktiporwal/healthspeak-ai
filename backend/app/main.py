@@ -13,6 +13,7 @@ from app.routers import (
     ai_status,
     auth,
     departments,
+    doctor_verification,
     health,
     intakes,
     kiosks,
@@ -51,5 +52,5 @@ app.add_middleware(
 # Every route lives under /api so it never collides with frontend paths.
 for r in (health.router, auth.router, users.router, admin_users.router, patients.router,
           intakes.router, ai_status.router, departments.router, visits.router,
-          kiosks.router):
+          kiosks.router, doctor_verification.router):
     app.include_router(r, prefix="/api")

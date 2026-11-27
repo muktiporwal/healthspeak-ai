@@ -14,6 +14,14 @@ class Role(StrEnum):
     ADMIN = "admin"  # hospital administrator
 
 
+class DoctorVerification(StrEnum):
+    """Where a self-registered doctor is in the administrator's verification of their credentials."""
+
+    PENDING = "pending"  # submitted, nobody has checked the details yet: NO doctor access
+    APPROVED = "approved"  # an administrator verified the registration details
+    REJECTED = "rejected"  # an administrator did not accept them
+
+
 class UiLanguage(StrEnum):
     """Language used to DISPLAY the app to one user (not the spoken-audio language)."""
 

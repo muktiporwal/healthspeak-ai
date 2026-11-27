@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Btn, Field, ModalBox } from "../../components/ui.jsx";
 import { confirmPasswordReset, requestPasswordReset } from "../../services/auth.js";
 import { translateError } from "../../i18n/index.js";
+import DevSmsNotice from "../../components/DevSmsNotice.jsx";
 
 export default function ForgotPassword({ initialIdentifier = "", close, onDone, notify }) {
   const { t } = useTranslation();
@@ -68,13 +69,7 @@ export default function ForgotPassword({ initialIdentifier = "", close, onDone, 
       ) : (
         <>
           <p>{t("forgot.sent")}</p>
-          {dev && (
-            <div className="dev-banner" role="status" data-testid="dev-otp">
-              <b>{t("forgot.devTitle")}</b>
-              <span>{t("forgot.devText")}</span>
-              <code>{dev.code}</code>
-            </div>
-          )}
+          {dev && <DevSmsNotice code={dev.code} />}
           <Field
             label={t("forgot.code")}
             value={code}

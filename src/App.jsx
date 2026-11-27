@@ -84,6 +84,8 @@ import {
 } from "./pages/staff/IntakeInsights.jsx";
 import VisitWorkspace from "./pages/staff/VisitWorkspace.jsx";
 import DoctorHome from "./pages/doctor/DoctorHome.jsx";
+import PendingVerification from "./pages/doctor/PendingVerification.jsx";
+import DoctorSignup from "./pages/auth/DoctorSignup.jsx";
 import AdminHome from "./pages/admin/AdminHome.jsx";
 import VisitStatus from "./pages/patient/VisitStatus.jsx";
 import { staffDashboard } from "./services/visits.js";
@@ -92,7 +94,7 @@ import LanguageSwitcher from "./components/LanguageSwitcher.jsx";
 import { kioskIdleSeconds, kioskKey, sendHeartbeat } from "./services/kiosk.js";
 // The greeting is shown in the reader's display language (it is not stored).
 const GREETING = { by: "doctor", key: "chat.greeting" };
-import { LANGUAGE_BY_CODE, NAME_BY_CODE, assistantLng } from "./i18n/languages.js";
+import { LANGUAGE_BY_CODE, NAME_BY_CODE, assistantLng, displayLanguageFor, speakingNameFor } from "./i18n/languages.js";
 // Server messages -> the chat bubble format the UI already uses.
 const toChat = (m) => ({
   by: m.sender === "patient" ? "patient" : "doctor",
@@ -108,6 +110,13 @@ const ROLE_LABELS = {
   staff: "Staff",
   admin: "Administrator",
 };
+// Where each signed-in person lands. Decided from the account the SERVER returned (role and, for doctors,
+// verification status), never from the role button chosen on the login screen.
+const homeFor = (u) =>
+  u.role === "doctor" && u.verification_status !== "approved"
+    ? "pending"
+    : { patient: "dashboard", staff: "staff", doctor: "doctor", admin: "admin" }[u.role] || "home";
+const PAGE_ROLE = { dashboard: "patient", staff: "staff", doctor: "doctor", pending: "doctor", admin: "admin" };
 export default function App() {
   const { t } = useTranslation();
   const [page, S] = useState("home"),
@@ -241,13 +250,15 @@ export default function App() {
       // The backend decides the role; the role buttons are only a hint.
       const u = await apiLogin(email, password);
       SetUser(u);
-      i18n.changeLanguage(u.ui_language); // this user's own display language
-      L(NAME_BY_CODE[u.ui_language] || "English"); // default speaking language
+      i18n.changeLanguage(displayLanguageFor(u.ui_language)); // this user's own display language
+      L(speakingNameFor(u.ui_language)); // default speaking language
       P("");
-      go({ patient: "dashboard", staff: "staff", doctor: "doctor", admin: "admin" }[u.role] || "home");
+      go(homeFor(u));
       const label = ROLE_LABELS[u.role] || u.role;
       notify(
-        label === role
+        u.role === "doctor" && u.verification_status !== "approved"
+          ? t("pending.toast", { defaultValue: "Your doctor account is waiting for administrator verification." })
+          : label === role
           ? t("common.welcomeName", { name: u.full_name })
           : t("common.loggedInAs", { role: t(`roles.${u.role}`), name: u.full_name }),
       );
@@ -430,9 +441,9 @@ export default function App() {
       .then((u) => {
         if (cancelled) return;
         SetUser(u);
-        i18n.changeLanguage(u.ui_language); // this user's saved display language
-        L(NAME_BY_CODE[u.ui_language] || "English");
-        const target = { patient: "dashboard", staff: "staff", doctor: "doctor", admin: "admin" }[u.role] || "home";
+        i18n.changeLanguage(displayLanguageFor(u.ui_language)); // this user's saved display language
+        L(speakingNameFor(u.ui_language));
+        const target = homeFor(u);
         // Only leave the landing/login page: never pull someone back from a page they already opened.
         S((p) => (p === "home" || p === "login" ? target : p));
       })
@@ -443,6 +454,13 @@ export default function App() {
       cancelled = true;
     };
   }, []);
+  // Safety net: a screen that belongs to another role (or an unverified doctor on the doctor dashboard)
+  // sends the person to their own home page.
+  useEffect(() => {
+    if (!user) return;
+    const need = PAGE_ROLE[page];
+    if ((need && need !== user.role) || (page === "doctor" && user.verification_status !== "approved")) go(homeFor(user));
+  }, [page, user]);
   // Opening the chat shows the patient's unfinished conversation (it is stored on the server).
   useEffect(() => {
     if (page === "chat" && user && user.role === "patient" && !convId) {
@@ -728,8 +746,29 @@ export default function App() {
               {t("auth.noAccount")}{" "}
               <button onClick={() => go("signup")}>{t("common.signup")}</button>
             </p>
+            <p className="switch">
+              {t("doctorReg.isDoctor", { defaultValue: "Are you a doctor?" })}{" "}
+              <button onClick={() => go("doctorsignup")} data-testid="doctor-register-link">
+                {t("doctorReg.registerLink", { defaultValue: "Register for verification" })}
+              </button>
+            </p>
             <small className="demo-note">{t("auth.demoNote")}</small>
           </div>
+        </Auth>
+      )}
+      {page === "doctorsignup" && (
+        <Auth go={go} onLanguage={changeUiLanguage}>
+          <DoctorSignup
+            go={go}
+            notify={notify}
+            onRegistered={(u) => {
+              SetUser(u);
+              i18n.changeLanguage(displayLanguageFor(u.ui_language));
+              P("");
+              go("pending");
+              notify(t("pending.registered", { defaultValue: "Application submitted. An administrator must verify it before you can use the doctor dashboard." }));
+            }}
+          />
         </Auth>
       )}
       {page === "signup" && (
@@ -1064,7 +1103,25 @@ export default function App() {
           </main>
         </div>
       )}
-      {page === "doctor" && user && (
+      {page === "pending" && user && user.role === "doctor" && user.verification_status !== "approved" && (
+        <PendingVerification
+          go={go}
+          notify={notify}
+          user={user}
+          onLogout={doLogout}
+          onRecheck={async () => {
+            const u = await getMe();
+            SetUser(u);
+            if (u.verification_status === "approved") {
+              go("doctor");
+              notify(t("pending.approved", { defaultValue: "Your account was approved. Welcome, doctor." }));
+            } else {
+              notify(t("pending.stillWaiting", { defaultValue: "Still waiting for administrator verification." }));
+            }
+          }}
+        />
+      )}
+      {page === "doctor" && user && user.role === "doctor" && user.verification_status === "approved" && (
         <DoctorHome
           go={go}
           onLanguage={changeUiLanguage}
@@ -1077,7 +1134,7 @@ export default function App() {
           }}
         />
       )}
-      {page === "admin" && user && (
+      {page === "admin" && user && user.role === "admin" && (
         <AdminHome
           go={go}
           onLanguage={changeUiLanguage}
@@ -1118,7 +1175,7 @@ export default function App() {
           notify={notify}
         />
       )}
-      {page === "staff" && (
+      {page === "staff" && user && user.role === "staff" && (
         <Staff
           go={go}
           notify={notify}

@@ -3,7 +3,8 @@
 Access (this phase):
 - patient: their own conversations and intakes only (others' ids return 404)
 - staff:   list, view (audited), correct and confirm intakes
-- doctor/admin: not yet (doctors get assigned-patient access with the queue phase)
+- doctor:  verified doctors read (only) the intakes of visits assigned to them, under /doctor/intakes
+- admin:   no access to intakes
 """
 
 import uuid
@@ -11,13 +12,14 @@ from typing import Literal
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Response, UploadFile, status
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.ai.audio import AudioRejected
 from app.core.config import get_settings
 from app.core.enums import ContentLanguage, ReviewStatus, Role
 from app.core.permissions import require_roles
-from app.database.models import Conversation, IntakeRecord, Patient, User
+from app.database.models import Conversation, IntakeRecord, Patient, QueueEntry, User
 from app.database.session import get_db
 from app.schemas.history import HistoryOut, SymptomAdd, SymptomOut, SymptomReview
 from app.schemas.intake import (
@@ -49,6 +51,7 @@ router = APIRouter(tags=["intake"])
 
 patient_only = require_roles(Role.PATIENT)
 staff_only = require_roles(Role.STAFF)
+doctor_only = require_roles(Role.DOCTOR)  # verified doctors only (see core/permissions.py)
 
 _ERRORS = {
     intake_service.ConsentMissing: (status.HTTP_403_FORBIDDEN,
@@ -176,6 +179,34 @@ def list_intakes(review_status: ReviewStatus | None = None,
                  limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0),
                  _: User = Depends(staff_only), db: Session = Depends(get_db)) -> IntakeList:
     return intake_service.list_for_staff(db, review_status=review_status, limit=limit, offset=offset)
+
+
+def _assigned_intake_or_404(intake_id: uuid.UUID, doctor: User, db: Session) -> IntakeRecord:
+    """A doctor may read an intake only when a visit assigned to THEM points at it (404 otherwise)."""
+    intake = _intake_or_404(intake_id, db)
+    assigned = db.scalar(select(QueueEntry.id).where(QueueEntry.intake_id == intake.id,
+                                                    QueueEntry.doctor_user_id == doctor.id).limit(1))
+    if assigned is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Intake not found")
+    return intake
+
+
+@router.get("/doctor/intakes/{intake_id}", response_model=IntakeStaffView)
+def doctor_read_intake(intake_id: uuid.UUID, doctor: User = Depends(doctor_only),
+                       db: Session = Depends(get_db)) -> IntakeStaffView:
+    """Read-only view of an intake for the doctor it is assigned to (symptoms, priority, evidence)."""
+    return intake_service.staff_view(db, _assigned_intake_or_404(intake_id, doctor, db), doctor)
+
+
+@router.get("/doctor/intakes/{intake_id}/history", response_model=HistoryOut)
+def doctor_intake_history(intake_id: uuid.UUID, limit: int = Query(5, ge=1, le=50), offset: int = Query(0, ge=0),
+                          doctor: User = Depends(doctor_only), db: Session = Depends(get_db)) -> HistoryOut:
+    """Earlier encounters of the same patient, for the assigned doctor (audited like the staff view)."""
+    intake = _assigned_intake_or_404(intake_id, doctor, db)
+    audit_service.record(db, "patient.history_viewed", actor_user_id=doctor.id, target_type="patient",
+                         target_id=intake.patient_id, details={"intake_id": str(intake.id)})
+    db.commit()
+    return history_service.for_intake(db, intake, limit=limit, offset=offset)
 
 
 @router.get("/intakes/{intake_id}", response_model=IntakeStaffView)

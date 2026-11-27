@@ -57,6 +57,7 @@ export default function DoctorHome({ go, notify, userName, onLogout, onOpen, onL
           emptyText={t("doctor.noneAssigned")}
           onOpen={onOpen}
           notify={notify}
+          urgentFirst
         />
         <section className="queue">
           <div className="section-title">

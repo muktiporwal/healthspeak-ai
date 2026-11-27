@@ -24,7 +24,7 @@ from app.database.models import (
     QueueNote,
     User,
 )
-from app.services import audit_service, notification_service
+from app.services import audit_service, doctor_service, notification_service
 
 
 class AlreadyQueued(Exception):
@@ -77,7 +77,7 @@ def _check_doctor(db: Session, doctor_user_id: uuid.UUID | None) -> User | None:
     if doctor_user_id is None:
         return None
     doctor = db.get(User, doctor_user_id)
-    if doctor is None or doctor.role != Role.DOCTOR.value or not doctor.is_active:
+    if doctor is None or not doctor.is_active or not doctor_service.is_verified(doctor):
         raise InvalidDoctor
     return doctor
 

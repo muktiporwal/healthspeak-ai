@@ -22,6 +22,8 @@ import {
   todayLocal,
 } from "../../services/visits.js";
 import { listDepartments, LANGUAGE_NAMES, formatDate } from "../../services/intake.js";
+import DoctorIntakeDetails from "../doctor/DoctorIntakeDetails.jsx";
+import { PriorityChip } from "./IntakeInsights.jsx";
 
 // Next steps offered as buttons (the server enforces the same rules).
 const ACTIONS = {
@@ -106,7 +108,7 @@ export default function VisitWorkspace({ entryId, role, go, notify, onBack }) {
       <main>
         <header className="dash-head">
           <div>
-            <span className="eyebrow">{isStaff ? "RECEPTION / PATIENT QUEUE" : "DOCTOR / MY PATIENTS"}</span>
+            <span className="eyebrow">{isStaff ? "RECEPTION / PATIENT QUEUE" : "DOCTOR DASHBOARD / MY PATIENTS"}</span>
             <h2>Patient visit</h2>
             <p>
               {v.department.name} · token {v.token} · {formatDate(v.created_at)}
@@ -129,7 +131,9 @@ export default function VisitWorkspace({ entryId, role, go, notify, onBack }) {
                   {LANGUAGE_NAMES[v.patient.preferred_language]}
                 </p>
               </div>
-              <Status value={v.status} />
+              <span>
+                {v.priority && <PriorityChip priority={v.priority} />} <Status value={v.status} />
+              </span>
             </div>
             <div className="workspace-details">
               <div>
@@ -210,6 +214,7 @@ export default function VisitWorkspace({ entryId, role, go, notify, onBack }) {
                 <p>No intake linked to this visit (walk-in).</p>
               )}
             </div>
+            {role === "doctor" && v.intake_id && <DoctorIntakeDetails intakeId={v.intake_id} notify={notify} />}
             <div className="workspace-section">
               <span className="eyebrow">CARE-TEAM NOTES</span>
               {v.notes.map((n) => (

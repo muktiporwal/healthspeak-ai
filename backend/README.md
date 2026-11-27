@@ -565,3 +565,29 @@ and all its data permanently.
 2. Import the model module in `alembic/env.py` (see the comment there).
 3. `..\.venv\Scripts\python.exe -m alembic revision --autogenerate -m "add users"`
 4. Review the generated file in `alembic/versions/`, then `alembic upgrade head`.
+
+## Doctor verification, role dashboards, demo OTP (migration 0014)
+
+**Doctor sign-up is never an instant doctor.** `POST /api/doctors/register` (public) creates the account with the
+role fixed by the server (the request has no role field; extra fields are rejected) and a `doctor_profiles` row with
+status **pending**: qualification, specialization, registration number, state council, hospital, years of
+experience. `core/permissions.require_roles` then refuses EVERY doctor endpoint (403) until an administrator approves
+(`POST /api/admin/doctors/{id}/approve`, or `/reject` with a required reason). Both decisions are audited
+(`doctor.registered/approved/rejected`). A doctor's own status is at `GET /api/doctors/me/verification` (the only
+endpoint open to a pending doctor). Pending doctors also cannot be assigned patients or appear in doctor pickers.
+Nobody can change their own role: preferences/profile/registration bodies reject a `role` field, and creating
+other roles stays administrator-only. Approved doctors read (read-only) the intake, priority, symptoms, field evidence
+and history of visits assigned to **them** (`GET /api/doctor/intakes/{id}` and `/history`; other doctors get 404).
+Doctors created directly by an administrator (the seeded demo doctor) have no profile row and count as verified.
+
+**Limits (say so):** the submitted details are claims; nothing checks a registration number against a real council
+register, the administrator must do that. No email/phone verification for doctors, no document upload, no rate
+limit on the public endpoint.
+
+**Demo OTP.** In development (APP_ENV=development, console SMS provider, DEV_OTP_ECHO not false) the API returns
+`dev_code` and the UI shows a "DEMO MODE" notification-style panel saying no real SMS was sent. In production the API
+never returns the code, so the panel cannot appear. Twilio is implemented but has NOT been tested with a real SMS.
+
+**Dogri** is hidden from every language picker (frontend flag in `src/i18n/languages.js`; set
+`VITE_ENABLE_DOGRI=true` to show it for testing). Backend support, translations and DB values are unchanged. An
+account whose saved display language is Dogri is shown English, labelled English.
