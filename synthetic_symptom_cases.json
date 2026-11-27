@@ -1,0 +1,357 @@
+[
+  {
+    "id": "case_01",
+    "text": "I have a fever and a headache.",
+    "expected_symptoms": [
+      "fever",
+      "headache"
+    ],
+    "expected_department": "neurology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_02",
+    "text": "I have no fever, but I have a cough.",
+    "expected_symptoms": [
+      "cough"
+    ],
+    "expected_department": "pulmonology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_03",
+    "text": "My mother has a cough and a headache.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Symptoms refer to another person; expected current patient symptom list is empty."
+  },
+  {
+    "id": "case_04",
+    "text": "My throat has been sore for three days.",
+    "expected_symptoms": [
+      "sore throat"
+    ],
+    "expected_department": "ent",
+    "expected_attention": false,
+    "notes": "Duration phrase is included."
+  },
+  {
+    "id": "case_05",
+    "text": "I have had stomach pain since yesterday.",
+    "expected_symptoms": [
+      "stomach pain"
+    ],
+    "expected_department": "gastroenterology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_06",
+    "text": "I feel nauseous and vomited twice.",
+    "expected_symptoms": [
+      "nausea",
+      "vomiting"
+    ],
+    "expected_department": "gastroenterology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_07",
+    "text": "My back hurts for the last two weeks.",
+    "expected_symptoms": [
+      "back pain"
+    ],
+    "expected_department": "orthopaedics",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_08",
+    "text": "I have a runny nose and sneezing.",
+    "expected_symptoms": [
+      "runny or blocked nose"
+    ],
+    "expected_department": "ent",
+    "expected_attention": false,
+    "notes": "Sneezing maps to the approved runny/blocked nose term."
+  },
+  {
+    "id": "case_09",
+    "text": "There is no dizziness, only a mild headache.",
+    "expected_symptoms": [
+      "headache"
+    ],
+    "expected_department": "neurology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_10",
+    "text": "My father has been feeling dizzy since morning.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Third-party symptom; current patient list expected empty."
+  },
+  {
+    "id": "case_11",
+    "text": "I have itchy skin and a rash on my arms.",
+    "expected_symptoms": [
+      "itching",
+      "rash"
+    ],
+    "expected_department": "dermatology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_12",
+    "text": "My eyes are red and itchy.",
+    "expected_symptoms": [
+      "eye problem",
+      "itching"
+    ],
+    "expected_department": "",
+    "expected_attention": false,
+    "notes": "Red eyes routes ophthalmology and itching routes dermatology at equal rule weights; expected ambiguous suggestion (no department code)."
+  },
+  {
+    "id": "case_13",
+    "text": "I have blurred vision in my left eye.",
+    "expected_symptoms": [
+      "eye problem"
+    ],
+    "expected_department": "ophthalmology",
+    "expected_attention": false,
+    "notes": "Uses the approved blurred-vision phrase."
+  },
+  {
+    "id": "case_14",
+    "text": "My ear hurts and I hear ringing in my ears.",
+    "expected_symptoms": [
+      "ear pain",
+      "hearing problem"
+    ],
+    "expected_department": "ent",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_15",
+    "text": "I have tooth pain when I chew.",
+    "expected_symptoms": [
+      "toothache"
+    ],
+    "expected_department": "dental",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_16",
+    "text": "My knee is swollen after playing.",
+    "expected_symptoms": [
+      "swelling"
+    ],
+    "expected_department": "orthopaedics",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_17",
+    "text": "I twisted my ankle and it hurts to walk.",
+    "expected_symptoms": [
+      "injury",
+      "pain (location not stated)"
+    ],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Twisted-ankle phrase is recognized as injury; walking pain also matches generic pain. Current default routing has no direct injury route."
+  },
+  {
+    "id": "case_18",
+    "text": "I have burning while urinating.",
+    "expected_symptoms": [
+      "burning urination"
+    ],
+    "expected_department": "urology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_19",
+    "text": "I have blood in my urine.",
+    "expected_symptoms": [
+      "bleeding"
+    ],
+    "expected_department": "urology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_20",
+    "text": "I have had diarrhea since last night.",
+    "expected_symptoms": [
+      "diarrhoea"
+    ],
+    "expected_department": "gastroenterology",
+    "expected_attention": false,
+    "notes": "Uses canonical British spelling."
+  },
+  {
+    "id": "case_21",
+    "text": "I am constipated and my stomach feels bloated.",
+    "expected_symptoms": [
+      "constipation"
+    ],
+    "expected_department": "gastroenterology",
+    "expected_attention": false,
+    "notes": "Bloating is not an approved lexicon term; constipation is expected and routes to gastroenterology."
+  },
+  {
+    "id": "case_22",
+    "text": "My child has a fever for two days.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Third-party child symptom, no pediatric department in routing configuration."
+  },
+  {
+    "id": "case_23",
+    "text": "My wife has a severe headache and nausea.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Third-party symptoms."
+  },
+  {
+    "id": "case_24",
+    "text": "No cough or cold, but I have a fever.",
+    "expected_symptoms": [
+      "fever"
+    ],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_25",
+    "text": "I have shortness of breath while resting.",
+    "expected_symptoms": [
+      "breathing difficulty"
+    ],
+    "expected_department": "pulmonology",
+    "expected_attention": true,
+    "notes": "Shortness of breath routes to pulmonology; it does not necessarily match configured attention phrases."
+  },
+  {
+    "id": "case_26",
+    "text": "I have sudden severe chest pain.",
+    "expected_symptoms": [
+      "chest pain"
+    ],
+    "expected_department": "cardiology",
+    "expected_attention": true,
+    "notes": "Attention flag expected from routing attention phrase."
+  },
+  {
+    "id": "case_27",
+    "text": "My lips are swollen and I have difficulty breathing.",
+    "expected_symptoms": [
+      "swelling",
+      "breathing difficulty"
+    ],
+    "expected_department": "pulmonology",
+    "expected_attention": true,
+    "notes": "Breathing difficulty routes pulmonology and phrase \"difficulty breathing\" is configured for staff attention."
+  },
+  {
+    "id": "case_28",
+    "text": "I have body aches after exercising.",
+    "expected_symptoms": [
+      "body pain"
+    ],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_29",
+    "text": "My shoulder has been painful for a week.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Shoulder-specific pain and the adjective painful are not approved exact phrases; retained as a vocabulary gap."
+  },
+  {
+    "id": "case_30",
+    "text": "I have a mild fever and chills.",
+    "expected_symptoms": [
+      "fever",
+      "chills"
+    ],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_31",
+    "text": "My grandmother has been coughing for five days.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Third-party symptom."
+  },
+  {
+    "id": "case_32",
+    "text": "I have no nausea and no vomiting.",
+    "expected_symptoms": [],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": "Both symptoms are denied, so reported symptoms expected empty."
+  },
+  {
+    "id": "case_33",
+    "text": "I feel tired and weak for about a month.",
+    "expected_symptoms": [
+      "tiredness",
+      "weakness"
+    ],
+    "expected_department": "general_medicine",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_34",
+    "text": "My gums bleed when I brush my teeth.",
+    "expected_symptoms": [
+      "bleeding"
+    ],
+    "expected_department": "dental",
+    "expected_attention": false,
+    "notes": "Gum-specific bleeding maps to general bleeding; dental route phrase may not match unless gum is mentioned."
+  },
+  {
+    "id": "case_35",
+    "text": "I have a headache but no fever.",
+    "expected_symptoms": [
+      "headache"
+    ],
+    "expected_department": "neurology",
+    "expected_attention": false,
+    "notes": ""
+  },
+  {
+    "id": "case_36",
+    "text": "My neck is stiff and painful since yesterday.",
+    "expected_symptoms": [
+      "neck pain"
+    ],
+    "expected_department": "orthopaedics",
+    "expected_attention": false,
+    "notes": "Neck stiffness phrase maps to neck pain; duration retained."
+  }
+]
