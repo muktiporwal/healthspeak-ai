@@ -6,6 +6,7 @@ import { Btn, Field, Info } from "../../components/ui.jsx";
 import { GENDER_CODES, LANGUAGE_CODES, getMyProfile, updateMyProfile } from "../../services/auth.js";
 import { translateError } from "../../i18n/index.js";
 import PhoneSection from "./PhoneSection.jsx";
+import { displayLanguageFor } from "../../i18n/languages.js";
 
 export default function Profile({ onBack, onSaved, notify }) {
   const { t } = useTranslation();
@@ -103,7 +104,7 @@ export default function Profile({ onBack, onSaved, notify }) {
             </div>
             <label className="field">
               <span>{t("auth.speakingLanguage")}</span>
-              <select value={form.preferred_language} onChange={set("preferred_language")}>
+              <select value={displayLanguageFor(form.preferred_language)} onChange={set("preferred_language")}>
                 {Object.values(LANGUAGE_CODES).map((code) => (
                   <option key={code} value={code}>
                     {t(`lang.${code}`)}

@@ -12,6 +12,7 @@ from app.database.models.intake import (
     IntakeRevision,
     Message,
 )
+from app.database.models.doctor import DoctorProfile
 from app.database.models.kiosk import Kiosk
 from app.database.models.password_reset import PasswordResetCode
 from app.database.models.patient import ConsentRecord, Patient
@@ -30,5 +31,5 @@ __all__ = [
     "ExtractedSymptom", "IntakeAnalysis", "IntakeRecord", "RoutingRule",
     "IntakeRevision", "Message", "PasswordResetCode", "Patient", "User",
     "Appointment", "DoctorSchedule", "Notification", "QueueCounter", "QueueEntry", "QueueNote",
-    "Kiosk",
+    "Kiosk", "DoctorProfile",
 ]

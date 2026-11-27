@@ -6,6 +6,7 @@ import { BadgeCheck, TriangleAlert } from "lucide-react";
 import { Btn, Field } from "../../components/ui.jsx";
 import { confirmPhoneCode, requestPhoneCode } from "../../services/auth.js";
 import { translateError } from "../../i18n/index.js";
+import DevSmsNotice from "../../components/DevSmsNotice.jsx";
 
 export default function PhoneSection({ profile, onChanged, notify }) {
   const { t } = useTranslation();
@@ -109,13 +110,7 @@ export default function PhoneSection({ profile, onChanged, notify }) {
       {open && sentTo && (
         <div className="phone-edit">
           <p>{t("profile.codeSentTo", { phone: sentTo })}</p>
-          {dev && (
-            <div className="dev-banner" role="status" data-testid="dev-otp">
-              <b>{t("forgot.devTitle")}</b>
-              <span>{t("forgot.devText")}</span>
-              <code>{dev.code}</code>
-            </div>
-          )}
+          {dev && <DevSmsNotice code={dev.code} />}
           <Field
             label={t("forgot.code")}
             value={code}

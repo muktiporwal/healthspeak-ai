@@ -186,6 +186,11 @@
   "forgot": {
     "devTitle": "Development mode",
     "devText": "No real SMS was sent. This code is shown here only because the server is in development mode. Your code:",
+    "devBadge": "DEMO MODE",
+    "devApp": "HealthSpeak AI · Messages",
+    "devNow": "now",
+    "devMessage": "Your HealthSpeak verification code is",
+    "devNoSms": "No real SMS was sent. In this demo the code is shown on screen. In production it would arrive by text message, and this panel would not appear.",
     "intro": "Enter the mobile number of your account. We will send you a 6-digit code by SMS.",
     "needMobile": "Enter your mobile number.",
     "sendCode": "Send code",

@@ -79,6 +79,7 @@ def _entry_out(db: Session, e: QueueEntry, cls=QueueEntryOut, **extra):
         doctor=Ref(id=e.doctor.id, name=e.doctor.full_name) if e.doctor else None,
         patient=_brief(e.patient), intake_id=e.intake_id,
         intake_review_status=intake.review_status if intake else None,
+        priority=intake.priority if intake else None,
         position=queue_service.position(db, e), created_at=e.created_at, checked_in_at=e.checked_in_at,
         called_at=e.called_at, completed_at=e.completed_at, **extra,
     )

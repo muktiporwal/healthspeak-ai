@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.core.clock import hospital_tz, local_day_bounds_utc, now_utc
 from app.core.enums import AppointmentStatus, Role
 from app.database.models import Appointment, Department, DoctorSchedule, Patient, User
-from app.services import audit_service, notification_service
+from app.services import audit_service, doctor_service, notification_service
 
 
 class InvalidDoctor(Exception):
@@ -31,13 +31,13 @@ class InvalidTransition(Exception):
 
 
 def doctors(db: Session) -> list[User]:
-    return list(db.scalars(select(User).where(User.role == Role.DOCTOR.value, User.is_active.is_(True))
+    return list(db.scalars(select(User).where(doctor_service.verified_doctor_clause())
                            .order_by(User.full_name)))
 
 
 def _doctor(db: Session, doctor_user_id: uuid.UUID) -> User:
     d = db.get(User, doctor_user_id)
-    if d is None or d.role != Role.DOCTOR.value or not d.is_active:
+    if d is None or not d.is_active or not doctor_service.is_verified(d):
         raise InvalidDoctor
     return d
 

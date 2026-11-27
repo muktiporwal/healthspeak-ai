@@ -3,9 +3,9 @@
 from datetime import datetime
 
 from sqlalchemy import Boolean, CheckConstraint, DateTime, Integer, String, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.core.enums import Role, UiLanguage, sql_in_list
+from app.core.enums import DoctorVerification, Role, UiLanguage, sql_in_list
 from app.database.base import Base
 from app.database.models.mixins import Timestamps, UuidPk
 
@@ -35,3 +35,15 @@ class User(UuidPk, Timestamps, Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     # Set only when the account holder proved they receive SMS on `phone` (one-time code).
     phone_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+    # Only self-registered doctors have one (see models/doctor.py).
+    doctor_profile = relationship("DoctorProfile", foreign_keys="DoctorProfile.user_id", uselist=False,
+                                  back_populates="user", lazy="joined")
+
+    @property
+    def verification_status(self) -> str | None:
+        """None for non-doctors. A doctor is 'approved' unless a registration is still pending/rejected.
+        (Doctors an administrator created directly have no profile row and are trusted.)"""
+        if self.role != Role.DOCTOR.value:
+            return None
+        return self.doctor_profile.verification_status if self.doctor_profile else DoctorVerification.APPROVED.value

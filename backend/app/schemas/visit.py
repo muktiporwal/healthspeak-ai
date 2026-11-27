@@ -33,6 +33,7 @@ class QueueEntryOut(BaseModel):
     patient: PatientBrief
     intake_id: uuid.UUID | None
     intake_review_status: ReviewStatus | None
+    priority: str | None = None  # "urgent" / "normal" of the linked intake (None if there is none)
     position: int | None
     created_at: datetime
     checked_in_at: datetime | None
