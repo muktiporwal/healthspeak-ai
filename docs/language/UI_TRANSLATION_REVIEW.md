@@ -12,7 +12,7 @@ _Original sheet by Sanjeev; strings re-copied from `src/i18n/*.json` and status 
 - **Dogri coverage:** `doi.json` has 244 keys; English has 356. Every key missing in Dogri falls back to Hindi and then to
   English, which is why Dogri would show Hindi on many screens today.
 - **Right-to-left:** selecting Urdu sets `html dir="rtl"` across screens.
-- **Doctor registration and Pending Verification pages are currently English-only** (they use English default text;
+- **The Pending Verification page is currently English-only** (they use English default text;
   other languages show the same English). Staff, doctor and admin screens are only partly translated.
 - **Emergency guidance in the chat** (call 112) is not a UI string: it comes from the backend dialogue templates in
   `backend/app/ai/dialogue_text.py`, in the language the patient is chatting in. Those need the same review.

@@ -91,10 +91,10 @@ try {
   await page.waitFor("window.__t.has('DOCTOR DASHBOARD') && window.__t.has('Patients assigned to me')");
   await page.waitFor(`window.__t.has('${token}')`, 10000);
   const docRows = await page.eval("[...document.querySelectorAll('.queue-row:not(.queue-head)')].map(r => r.innerText.split('\\n')[0])");
-  check("doctor sees assigned patient", docRows.includes(token), docRows.join(","));
-  check("doctor sees today's appointment list section", await t("has(\"Today's appointments\")"));
+  check("doctor sees assigned patient", docRows.some((r) => r.startsWith(token)), docRows.join(",")); // the row's first line is the token plus its priority badge
+  check("doctor sees the upcoming appointments section", await t("has(\"Upcoming appointments\")"));
   await page.eval(`[...document.querySelectorAll('.queue-row')].find(r => r.innerText.includes('${token}')).querySelector('button').click()`);
-  await page.waitFor("window.__t.has('DOCTOR / MY PATIENTS')");
+  await page.waitFor("window.__t.has('DOCTOR DASHBOARD / MY PATIENTS')");
   check("doctor has no booking or reassign controls", !(await t("has('BOOK AN APPOINTMENT')")) && !(await page.eval(`!!${fieldSelect("Assigned doctor")}`).catch(() => false)));
   await clearToast();
   await t("btn('Call patient in')");

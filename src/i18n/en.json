@@ -142,11 +142,11 @@
     "liveEmpty": "Nobody is in the queue yet. Confirmed intakes appear here automatically."
   },
   "doctor": {
-    "myDay": "My day", "role": "Doctor", "eyebrow": "DOCTOR DASHBOARD", "hello": "Hello, {{name}}",
+    "role": "Doctor", "eyebrow": "DOCTOR DASHBOARD", "hello": "Hello, {{name}}",
     "assignedToday": "Patients assigned to you today.", "waiting": "Waiting / checked-in", "withYou": "With you now",
     "completed": "Completed today", "appointments": "Appointments today", "myPatients": "MY PATIENTS",
     "assignedTitle": "Patients assigned to me", "noneAssigned": "No patients are assigned to you right now.",
-    "apptEyebrow": "APPOINTMENTS", "apptTitle": "Today's appointments", "noAppts": "No appointments today."
+    "apptEyebrow": "APPOINTMENTS", "apptTitle": "Upcoming appointments", "noAppts": "No upcoming appointments."
   },
   "admin": {
     "role": "Administrator", "eyebrow": "ADMINISTRATOR DASHBOARD", "title": "Hospital overview",
