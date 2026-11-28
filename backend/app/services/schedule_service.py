@@ -151,11 +151,14 @@ def book(db: Session, *, patient: Patient, doctor_user_id: uuid.UUID, starts_at:
     return appt
 
 
-def list_appointments(db: Session, *, day: date | None = None, doctor_user_id: uuid.UUID | None = None,
+def list_appointments(db: Session, *, day: date | None = None, days: int = 1,
+                      doctor_user_id: uuid.UUID | None = None,
                       patient_id: uuid.UUID | None = None) -> list[Appointment]:
+    """Appointments on `day`, or on `day` and the following `days - 1` days (hospital-local calendar days)."""
     q = select(Appointment)
     if day:
-        start, end = local_day_bounds_utc(day)
+        start, _ = local_day_bounds_utc(day)
+        _, end = local_day_bounds_utc(day + timedelta(days=max(days, 1) - 1))
         q = q.where(Appointment.starts_at >= start, Appointment.starts_at < end)
     if doctor_user_id:
         q = q.where(Appointment.doctor_user_id == doctor_user_id)

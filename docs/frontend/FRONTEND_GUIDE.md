@@ -25,16 +25,20 @@ _Original guide by Sanjeev; updated for the current app (doctor verification, ro
    per-field evidence labels (`Exact match`, `Possible match`, `Added or corrected by staff`, `Not found`, `Rejected`) and
    the patient's earlier visits. The immutable original words and the labelled machine translation are shown in the
    `IntakeReview` screen in `src/App.jsx`.
-5. **Doctor pages:** `src/pages/auth/DoctorSignup.jsx` (registration), `src/pages/doctor/PendingVerification.jsx`
-   (shown until approval), `src/pages/doctor/DoctorHome.jsx` (dashboard) and `DoctorIntakeDetails.jsx` (read-only
-   intake for assigned patients). The admin approves in `src/pages/admin/DoctorApprovals.jsx`.
+5. **Doctor pages:** `src/pages/doctor/PendingVerification.jsx` (shown to a doctor account that is not yet approved),
+   `src/pages/doctor/DoctorHome.jsx` (dashboard) and `DoctorIntakeDetails.jsx` (read-only intake for assigned
+   patients). The admin approves in `src/pages/admin/DoctorApprovals.jsx`. **The frontend has no doctor sign-up
+   screen:** doctor accounts are created by an administrator. Choosing "Doctor" on the login screen shows a
+   doctor-only login (no Patient option, no sign-up link).
 
 ## Authentication, token and roles
 
 - The login token is kept in `sessionStorage` under `healthspeak.token`, so it is forgotten when the tab closes.
-- A doctor who registers is **Pending Verification**: the server refuses every doctor endpoint (403) until an
-  administrator approves, so the pending page shows no patient data. This is enforced by the backend, not the page.
-- Doctor registration and Pending Verification pages are currently English-only.
+- A doctor account that is **Pending Verification** is refused by every doctor endpoint (403) until an administrator
+  approves, so the pending page shows no patient data. This is enforced by the backend, not the page.
+- The backend still exposes a public `POST /api/doctors/register` endpoint (it always creates a pending account);
+  the frontend no longer calls it.
+- The Pending Verification page is currently English-only.
 
 ## OTP (development demo mode)
 

@@ -85,7 +85,6 @@ import {
 import VisitWorkspace from "./pages/staff/VisitWorkspace.jsx";
 import DoctorHome from "./pages/doctor/DoctorHome.jsx";
 import PendingVerification from "./pages/doctor/PendingVerification.jsx";
-import DoctorSignup from "./pages/auth/DoctorSignup.jsx";
 import AdminHome from "./pages/admin/AdminHome.jsx";
 import VisitStatus from "./pages/patient/VisitStatus.jsx";
 import { staffDashboard } from "./services/visits.js";
@@ -461,6 +460,11 @@ export default function App() {
     const need = PAGE_ROLE[page];
     if ((need && need !== user.role) || (page === "doctor" && user.verification_status !== "approved")) go(homeFor(user));
   }, [page, user]);
+  // Doctor login mode hides the Patient option, so leaving the login screen must switch it off again
+  // (otherwise the next person to open "Log in", for example a patient, would not see the Patient option).
+  useEffect(() => {
+    if (page !== "login") R("Patient");
+  }, [page]);
   // Opening the chat shows the patient's unfinished conversation (it is stored on the server).
   useEffect(() => {
     if (page === "chat" && user && user.role === "patient" && !convId) {
@@ -691,10 +695,15 @@ export default function App() {
             </button>
             <span className="eyebrow">{t("auth.eyebrow")}</span>
             <h2>{t("auth.welcomeBack")}</h2>
-            <p>{t("auth.selectRole")}</p>
+            <p>
+              {role === "Doctor"
+                ? t("auth.doctorLoginHint", { defaultValue: "Doctor login: enter your registered email or mobile number and password." })
+                : t("auth.selectRole")}
+            </p>
             <b className="label-title">{t("auth.loggingInAs")}</b>
             <div className="roles">
-              {["Patient", "Doctor", "Staff"].map((r) => (
+              {/* Doctor login mode offers no Patient option. The server still decides the real role. */}
+              {(role === "Doctor" ? ["Doctor"] : ["Patient", "Doctor", "Staff"]).map((r) => (
                 <button
                   key={r}
                   className={role === r ? "chosen" : ""}
@@ -742,33 +751,14 @@ export default function App() {
             <Btn onClick={login} disabled={busy}>
               {busy ? t("auth.loggingIn") : t("common.login")}
             </Btn>
-            <p className="switch">
-              {t("auth.noAccount")}{" "}
-              <button onClick={() => go("signup")}>{t("common.signup")}</button>
-            </p>
-            <p className="switch">
-              {t("doctorReg.isDoctor", { defaultValue: "Are you a doctor?" })}{" "}
-              <button onClick={() => go("doctorsignup")} data-testid="doctor-register-link">
-                {t("doctorReg.registerLink", { defaultValue: "Register for verification" })}
-              </button>
-            </p>
+            {role !== "Doctor" && (
+              <p className="switch">
+                {t("auth.noAccount")}{" "}
+                <button onClick={() => go("signup")}>{t("common.signup")}</button>
+              </p>
+            )}
             <small className="demo-note">{t("auth.demoNote")}</small>
           </div>
-        </Auth>
-      )}
-      {page === "doctorsignup" && (
-        <Auth go={go} onLanguage={changeUiLanguage}>
-          <DoctorSignup
-            go={go}
-            notify={notify}
-            onRegistered={(u) => {
-              SetUser(u);
-              i18n.changeLanguage(displayLanguageFor(u.ui_language));
-              P("");
-              go("pending");
-              notify(t("pending.registered", { defaultValue: "Application submitted. An administrator must verify it before you can use the doctor dashboard." }));
-            }}
-          />
         </Auth>
       )}
       {page === "signup" && (

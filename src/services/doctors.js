@@ -1,13 +1,7 @@
-// Doctor registration / verification and the doctor's read-only intake view.
+// Doctor verification status, the administrator's approvals, and the doctor's read-only intake view.
+// The app has no doctor sign-up screen: doctor accounts are created by an administrator.
 // The server decides every permission; nothing here grants access.
-import { api, tokenStore } from "./api.js";
-
-// Creates a PENDING doctor account (the server fixes the role; the form cannot choose one).
-export async function registerDoctor(payload) {
-  const data = await api("/doctors/register", { method: "POST", body: payload, auth: false });
-  tokenStore.set(data.access_token);
-  return data.user;
-}
+import { api } from "./api.js";
 
 export const getMyVerification = () => api("/doctors/me/verification");
 

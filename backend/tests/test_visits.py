@@ -214,6 +214,25 @@ def test_booking_double_booking_cancel_and_rebook(client, staff, schedule, make_
                                                                    "starts_at": slot}).status_code == 201
 
 
+def test_doctor_sees_upcoming_appointments_with_days_option(client, staff, schedule, make_patient, doctor):
+    dh, did, _ = schedule
+    oh, _ = doctor("upcoming-other@example.com")
+    _, pid = make_patient("9844400062", "Synthetic Upcoming")
+    day = _next(2)
+    slot = client.get("/api/appointments/slots", headers=staff,
+                      params={"doctor_user_id": did, "day": day}).json()[0]["starts_at"]
+    assert client.post("/api/appointments", headers=staff, json={
+        "patient_id": pid, "doctor_user_id": did, "starts_at": slot}).status_code == 201
+    needed = (day - local_today()).days + 1  # smallest window (today = day 1) that reaches the booking
+    assert client.get("/api/appointments", headers=dh).json() == []  # default is still today only
+    assert client.get("/api/appointments", headers=dh, params={"days": needed - 1}).json() == []
+    seen = client.get("/api/appointments", headers=dh, params={"days": needed}).json()
+    assert len(seen) == 1 and seen[0]["patient"]["name"] == "Synthetic Upcoming"
+    assert client.get("/api/appointments", headers=oh, params={"days": 31}).json() == []  # not another doctor's
+    assert client.get("/api/appointments", headers=dh, params={"days": 0}).status_code == 422
+    assert client.get("/api/appointments", headers=dh, params={"days": 32}).status_code == 422
+
+
 def test_doctor_sees_own_schedule_and_appointments_only(client, staff, schedule, doctor, auth_headers):
     dh, did, _ = schedule
     oh, _ = doctor("nosched@example.com")

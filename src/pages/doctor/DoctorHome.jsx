@@ -2,10 +2,14 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "../../components/LanguageSwitcher.jsx";
-import { CalendarDays, CheckCircle2, Clock3, LayoutDashboard, LogOut, Users } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock3, LogOut, Users } from "lucide-react";
 import { Brand, Stat, initials, pad2, timeOnly } from "../../components/ui.jsx";
 import QueuePanel from "../staff/QueuePanel.jsx";
 import { doctorDashboard, listAppointments } from "../../services/visits.js";
+
+const UPCOMING_DAYS = 14;
+const dateShort = (iso) =>
+  iso ? new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" }) : "";
 
 export default function DoctorHome({ go, notify, userName, onLogout, onOpen, onLanguage }) {
   const { t } = useTranslation();
@@ -13,7 +17,8 @@ export default function DoctorHome({ go, notify, userName, onLogout, onOpen, onL
   const [appts, SetAppts] = useState(null);
   useEffect(() => {
     doctorDashboard().then(SetDash).catch((err) => notify(err.message));
-    listAppointments().then(SetAppts).catch(() => SetAppts([]));
+    // Today and the next 13 days, so a booking for tomorrow is visible today.
+    listAppointments({ days: UPCOMING_DAYS }).then(SetAppts).catch(() => SetAppts([]));
   }, []);
   const q = dash ? dash.my_queue : null;
   return (
@@ -21,11 +26,6 @@ export default function DoctorHome({ go, notify, userName, onLogout, onOpen, onL
       <aside className="staff-sidebar">
         <Brand go={go} />
         <LanguageSwitcher onChange={onLanguage} className="language" />
-        <nav>
-          <button className="active">
-            <LayoutDashboard /> {t("doctor.myDay")}
-          </button>
-        </nav>
         <div className="staff-user">
           <div className="avatar">{initials(userName)}</div>
           <div>
@@ -70,7 +70,7 @@ export default function DoctorHome({ go, notify, userName, onLogout, onOpen, onL
           {appts && !appts.length && <p className="empty">{t("doctor.noAppts")}</p>}
           {(appts || []).map((a) => (
             <p key={a.id}>
-              <b>{timeOnly(a.starts_at)}</b> · {a.patient.name} · {a.department}
+              <b>{dateShort(a.starts_at)}, {timeOnly(a.starts_at)}</b> · {a.patient.name} · {a.department}
               {a.room ? ` · ${a.room}` : ""} · {a.status}
             </p>
           ))}

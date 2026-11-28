@@ -268,11 +268,13 @@ def book(body: AppointmentCreate, staff: User = Depends(staff_only), db: Session
 
 
 @router.get("/appointments", response_model=list[AppointmentOut])
-def list_appointments(day: date | None = None, doctor_user_id: uuid.UUID | None = None,
+def list_appointments(day: date | None = None, days: int = Query(1, ge=1, le=31),
+                      doctor_user_id: uuid.UUID | None = None,
                       user: User = Depends(staff_or_doctor), db: Session = Depends(get_db)):
+    """`day` defaults to today. `days` (default 1) also lists the following days, so a doctor can see upcoming bookings."""
     if user.role == Role.DOCTOR.value:
         doctor_user_id = user.id
-    return [_appt_out(a) for a in schedule_service.list_appointments(db, day=day or local_today(),
+    return [_appt_out(a) for a in schedule_service.list_appointments(db, day=day or local_today(), days=days,
                                                                        doctor_user_id=doctor_user_id)]
 
 

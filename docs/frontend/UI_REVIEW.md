@@ -9,7 +9,8 @@ English, Hindi, Urdu and Dogri flows without modifying application code.
 
 > **Current status:** Dogri is now hidden from every language picker (flag in `src/i18n/languages.js`), so findings
 > about Dogri describe the interface as it would look if it were switched back on with `VITE_ENABLE_DOGRI=true`.
-> Doctor registration and the Pending Verification page are English-only. In development, the one-time code is shown
+> The frontend has no doctor sign-up screen (an administrator creates doctor accounts), and the Pending Verification
+> page is English-only. In development, the one-time code is shown
 > in a labelled demo panel and no real SMS is sent.
 
 ## Observations and Findings
@@ -28,6 +29,6 @@ English, Hindi, Urdu and Dogri flows without modifying application code.
    `Added or corrected by staff`, `Not found`, `Rejected`) instead of misleading confidence percentages.
 5. **Voice transcript editability:** letting patients review and edit the raw transcript before submission prevents
    transcription mistakes from entering the intake record.
-6. **Not yet reviewed (added):** the doctor registration form, the Pending Verification page, the doctor dashboard
+6. **Not yet reviewed (added):** the doctor-only login view, the Pending Verification page, the doctor dashboard
    with Urgent / Normal chips, the admin doctor-approvals panel and the demo OTP panel are newer than this walk-through.
-   The doctor registration and Pending Verification pages are English-only and should be checked in Hindi and Urdu.
+   The Pending Verification page is English-only and should be checked in Hindi and Urdu.
